@@ -46,4 +46,4 @@ No frills. `pip install figshare`. Or clone from github and `python setup.py ins
 
 Dependencies
 ------------
-Just `requests_oauthlib`, and `six`. Get them with `pip install -r requirements.txt`
+Python 2.6, 2.7 or 3.2+. The packages `requests_oauthlib`, and `six` are required. Get them with `pip install -r requirements.txt`
