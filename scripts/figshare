@@ -1,0 +1,78 @@
+#!/usr/bin/env python
+
+import os
+import argparse
+from pprint import pprint
+from figshare.figshare import Figshare, consumer_key, consumer_secret
+from figshare.oauth_dance import oauth_dance, read_token_file
+
+ACTIONS = {}
+def register_action(name):
+    def wrapper(f):
+        ACTIONS[name] = f
+        return f
+    return wrapper
+
+
+def build_parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--oauth_filename', help='Path to file storing oauth credentials', default='~/.figshare-token', type=os.path.expanduser)
+    subparsers = parser.add_subparsers(dest='command')
+
+    list_articles = subparsers.add_parser('list_articles')
+
+    create_article = subparsers.add_parser('create_article')
+    create_article.add_argument('--title', required=True)
+    create_article.add_argument('--description', required=True)
+    create_article.add_argument('--defined_type', default='fileset', choices=['fileset', 'dataset', 'media', 'figure', 'paper', 'poster'])
+
+    upload_file = subparsers.add_parser('upload_file')
+    upload_file.add_argument('--article_id', required=True)
+    upload_file.add_argument('--file', required=True)
+    delete_file = subparsers.add_parser('delete_file')
+    delete_file.add_argument('--article_id', required=True)
+    delete_file.add_argument('--file_id', required=True)    
+
+    return parser
+
+
+def connect(args):
+    if not os.path.exists(args.oauth_filename):
+        access_token, access_token_secret = oauth_dance('figshare-python',
+            consumer_key, consumer_secret, token_filename=args.oauth_filename)
+    else:
+        access_token, access_token_secret = read_token_file(args.oauth_filename)
+
+    figshare = Figshare(consumer_key, consumer_secret, access_token, access_token_secret)
+    return figshare
+
+
+@register_action('list_articles')
+def list_articles(figshare, args):
+    pprint(figshare.articles())
+
+
+@register_action('create_article')
+def create_article(figshare, args):
+    pprint(figshare.create_article(args.title, args.description, args.defined_type))
+
+
+@register_action('upload_file')
+def upload_file(figshare, args):
+    pprint(figshare.upload_file(args.article_id, args.file))
+
+
+@register_action('delete_file')
+def delete_file(figshare, args):
+    pprint(figshare.delete_file(args.article_id, args.file_id))
+
+
+def main():
+    parser = build_parser()
+    args = parser.parse_args()
+    figshare = connect(args)
+    ACTIONS[args.command](figshare, args)
+
+
+if __name__ == '__main__':
+    main()
