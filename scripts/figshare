@@ -7,6 +7,7 @@ import os
 import sys
 import argparse
 import textwrap
+import itertools
 from pprint import pprint
 from figshare.utils import strip_html
 from figshare.figshare import Figshare, consumer_key, consumer_secret
@@ -76,7 +77,21 @@ def list_articles(figshare, args):
         lines = [item['title']]
         lines += ['-'*len(lines[-1])]
         lines += ['article_id: {}'.format(item['article_id'])]
-        lines += textwrap.wrap('description: {}'.format(strip_html(item['description'])))
+
+        description = textwrap.wrap('description: {}'.format(strip_html(item['description'])))
+        if len(description) > 3:
+            description = description[:3]
+            description[-1] += '...'
+        lines += description
+
+        lines += ['total size: {}'.format(item['total_size'])]
+        lines += ['Files:']
+        file_lines = []
+        for file in item['files']:
+            file_lines += ['\t{}\t\t\t{}'.format(file['name'], file['size'])]
+        if len(file_lines) > 3:
+            file_lines = file_lines[:3] + ['\t... more ...']
+        lines += file_lines
 
         print(os.linesep.join(lines + ['']))
 
