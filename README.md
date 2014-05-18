@@ -4,7 +4,16 @@ figshare command line client
 [![Downloads](https://pypip.in/d/figshare/badge.png)](https://pypi.python.org/pypi/figshare)
 
 
-This is a simple client for the figshare API in python.
+This is a simple client for the figshare API in python. Currently very much a work-in-progress.
+The relatively annoying handling of the OAuth back and forth is implemented using
+requests-oauthlib. Currently the following actions are implemented:
+* list_articles
+* create_article
+* upload_file
+* delete_file
+
+The API supports [quite a few more](http://api.figshare.com/docs/demo_python.html#sample-code-for-python)
+actions which haven't been implemented yet. I'm happy to merge PRs!
 
 Example
 -------
