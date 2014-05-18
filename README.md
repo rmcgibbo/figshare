@@ -17,15 +17,8 @@ $ figshare upload_file --article_id 1030329 --file /path/to/file
 
 Install
 -------
-
-```
-$ python setup.py install
-```
+No frills. Just `python setup.py install`
 
 Dependencies
 ------------
-requests_oauthlib, six
-
-```
-pip install -r requirements.txt
-```
+Just `requests_oauthlib`, and `six`. Get them with `pip install -r requirements.txt`
