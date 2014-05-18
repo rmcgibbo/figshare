@@ -1,8 +1,14 @@
 #!/usr/bin/env python
+"""Simple command line client for the figshare API. Can be used to upload files.
+"""
 
+from __future__ import print_function
 import os
+import sys
 import argparse
+import textwrap
 from pprint import pprint
+from figshare.utils import strip_html
 from figshare.figshare import Figshare, consumer_key, consumer_secret
 from figshare.oauth_dance import oauth_dance, read_token_file
 
@@ -14,28 +20,6 @@ def register_action(name):
     return wrapper
 
 
-def build_parser():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--oauth_filename', help='Path to file storing oauth credentials', default='~/.figshare-token', type=os.path.expanduser)
-    subparsers = parser.add_subparsers(dest='command')
-
-    list_articles = subparsers.add_parser('list_articles')
-
-    create_article = subparsers.add_parser('create_article')
-    create_article.add_argument('--title', required=True)
-    create_article.add_argument('--description', required=True)
-    create_article.add_argument('--defined_type', default='fileset', choices=['fileset', 'dataset', 'media', 'figure', 'paper', 'poster'])
-
-    upload_file = subparsers.add_parser('upload_file')
-    upload_file.add_argument('--article_id', required=True)
-    upload_file.add_argument('--file', required=True)
-    delete_file = subparsers.add_parser('delete_file')
-    delete_file.add_argument('--article_id', required=True)
-    delete_file.add_argument('--file_id', required=True)    
-
-    return parser
-
-
 def connect(args):
     if not os.path.exists(args.oauth_filename):
         access_token, access_token_secret = oauth_dance('figshare-python',
@@ -43,13 +27,58 @@ def connect(args):
     else:
         access_token, access_token_secret = read_token_file(args.oauth_filename)
 
-    figshare = Figshare(consumer_key, consumer_secret, access_token, access_token_secret)
+    figshare = Figshare(consumer_key, consumer_secret,
+                        access_token, access_token_secret)
     return figshare
 
 
+
+def build_parser():
+    parser = argparse.ArgumentParser(description=__doc__,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--oauth_filename', default='~/.figshare-token',
+        help='''Path to file storing oauth credentials''',
+        type=os.path.expanduser)
+
+    subparsers = parser.add_subparsers(title='commands', dest='command')
+
+    list_articles = subparsers.add_parser('list_articles',
+        help='List articles')
+
+    create_article = subparsers.add_parser('create_article',
+        help='Create a new article (draft)')
+    create_article.add_argument('--title', required=True)
+    create_article.add_argument('--description', required=True)
+    create_article.add_argument('--defined_type', default='fileset',
+        choices=['fileset', 'dataset', 'media', 'figure', 'paper', 'poster'])
+
+    upload_file = subparsers.add_parser('upload_file',
+        help='Upload a new file into an article')
+    upload_file.add_argument('--article_id', required=True)
+    upload_file.add_argument('--file', required=True)
+
+    delete_file = subparsers.add_parser('delete_file',
+        help='Delete a file from an article')
+    delete_file.add_argument('--article_id', required=True)
+    delete_file.add_argument('--file_id', required=True)
+
+    return parser
+
+###############################################################################
+# Individual actions. functions that get called when the user selects the
+# corresponding subcommand
+###############################################################################
+
 @register_action('list_articles')
 def list_articles(figshare, args):
-    pprint(figshare.articles())
+    articles = figshare.articles()
+    for item in articles['items']:
+        lines = [item['title']]
+        lines += ['-'*len(lines[-1])]
+        lines += ['article_id: {}'.format(item['article_id'])]
+        lines += textwrap.wrap('description: {}'.format(strip_html(item['description'])))
+
+        print(os.linesep.join(lines + ['']))
 
 
 @register_action('create_article')
@@ -59,6 +88,8 @@ def create_article(figshare, args):
 
 @register_action('upload_file')
 def upload_file(figshare, args):
+    print('uploading...', end='')
+    sys.stdout.flush()
     pprint(figshare.upload_file(args.article_id, args.file))
 
 
@@ -66,6 +97,9 @@ def upload_file(figshare, args):
 def delete_file(figshare, args):
     pprint(figshare.delete_file(args.article_id, args.file_id))
 
+###############################################################################
+# main entry point
+###############################################################################
 
 def main():
     parser = build_parser()
