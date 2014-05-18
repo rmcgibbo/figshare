@@ -1,7 +1,7 @@
 from distutils.core import setup
 
 setup(name='figshare',
-      version='0.1.1',
+      version='0.1.2',
       packages=['figshare'],
       author='Robert T. McGibbon',
       author_email='rmcgibbo@gmail.com',
