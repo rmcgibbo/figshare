@@ -25,7 +25,7 @@ $ figshare delete_file --article_id 1030329 --file_id 1502207
 
 Install
 -------
-No frills. Just `python setup.py install`
+No frills. `pip install figshare`. Or clone from github and `python setup.py install`.
 
 Dependencies
 ------------
