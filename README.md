@@ -12,7 +12,15 @@ $ figshare list_articles
  u'items': [{u'article_id': 1030329,
  ...
  
-$ figshare upload_file --article_id 1030329 --file /path/to/file
+$ figshare upload_file --article_id 1030329 --file ../1xd3/simulate_1xd3.py
+{u'extension': u'py',
+ u'id': 1502207,
+ u'mime_type': u'text/x-python',
+ u'name': u'simulate_1xd3.py',
+ u'size': u'1 KB'}
+ 
+$ figshare delete_file --article_id 1030329 --file_id 1502207
+{u'success': u'Link to simulate_1xd3.py  deleted'}
 ```
 
 Install
