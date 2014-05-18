@@ -1,5 +1,8 @@
 figshare command line client
 ============================
+[![PyPI Version](https://badge.fury.io/py/figshare.png)](https://pypi.python.org/pypi/figshare)
+[![Downloads](https://pypip.in/d/figshare/badge.png)](https://pypi.python.org/pypi/figshare)
+
 
 This is a simple client for the figshare API in python.
 
