@@ -84,14 +84,14 @@ def list_articles(figshare, args):
             description[-1] += '...'
         lines += description
 
-        lines += ['total size: {}'.format(item['total_size'])]
-        lines += ['Files:']
+        # lines += ['Files:']
         file_lines = []
         for file in item['files']:
-            file_lines += ['\t{}\t\t\t{}'.format(file['name'], file['size'])]
-        if len(file_lines) > 3:
-            file_lines = file_lines[:3] + ['\t... more ...']
+            file_lines += ['\t{name}\t\t\t{size}\t\tfile_id: {id}'.format(**file)]
+        #if len(file_lines) > 3:
+        #    file_lines = file_lines[:3] + ['\t... more ...']
         lines += file_lines
+        lines += ['total size: {}'.format(item['total_size'])]
 
         print(os.linesep.join(lines + ['']))
 
@@ -121,10 +121,11 @@ def main():
     args = parser.parse_args()
     figshare = connect(args)
     try:
-        ACTIONS[args.command](figshare, args)
+        action = ACTIONS[args.command]
     except KeyError:
         parser.print_help()
         parser.exit(1)
+    action(figshare, args)
 
 if __name__ == '__main__':
     main()
