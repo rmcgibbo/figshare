@@ -120,8 +120,11 @@ def main():
     parser = build_parser()
     args = parser.parse_args()
     figshare = connect(args)
-    ACTIONS[args.command](figshare, args)
-
+    try:
+        ACTIONS[args.command](figshare, args)
+    except KeyError:
+        parser.print_help()
+        parser.exit(1)
 
 if __name__ == '__main__':
     main()

@@ -27,8 +27,8 @@ def read_token_file(filename):
     """
     Read a token file and return the oauth token and oauth token secret.
     """
-    f = open(filename)
-    return f.readline().strip(), f.readline().strip()
+    with open(filename) as f:
+        return f.readline().strip(), f.readline().strip()
 
 
 def oauth_dance(app_name, consumer_key, consumer_secret, token_filename=None):

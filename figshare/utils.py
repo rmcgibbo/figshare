@@ -4,6 +4,7 @@ def strip_html(html):
     class MLStripper(HTMLParser):
         def __init__(self):
             self.reset()
+            self.strict = False
             self.fed = []
         def handle_data(self, d):
             self.fed.append(d)
