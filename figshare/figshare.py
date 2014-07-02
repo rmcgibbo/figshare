@@ -67,8 +67,13 @@ class Figshare(object):
         return response.content.json()
 
     def update_article(self, article_id, title=None, description=None, defined_type=None):
-        response = self.client.put('%s/articles/%s' % (self.endpoint, article_id))
-        return response.content.json()
+        data = {'title': title,
+                'description': description,
+                'defined_type': defined_type}
+        data = dict((k, v) for k, v in data.items() if v is not None)
+        headers={'content-type':'application/json'}
+        response = self.client.put('%s/articles/%s' % (self.endpoint, article_id), data=json.dumps(data), headers=headers)
+        return json.loads(response.content)
 
     def upload_file(self, article_id, filepath_or_buffer):
         if isinstance(filepath_or_buffer, six.string_types):
