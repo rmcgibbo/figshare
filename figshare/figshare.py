@@ -11,9 +11,48 @@ class Figshare(object):
         self.client = OAuth1Session(consumer_key, consumer_secret, access_token, access_token_secret)
         self.endpoint = 'http://api.figshare.com/v1/my_data'
 
-    def articles(self):
-        response = self.client.get(self.endpoint + '/articles')
-        return response.json()
+    def articles(self, limit=None):
+        """
+        Parameters
+        ----------
+
+        limit : int or None
+            If not None, then limit the number of articles returned.
+
+        Returns
+        -------
+        Dict of {count: integer count of articles, items: dictionary
+        representing each article}
+        """
+        # API only returns 10 results at a time, so keep asking for more pages
+        # until we can't get any more...
+        all_articles = []
+        count = 0
+        page = 1
+        while True:
+            if limit is not None and (len(all_articles) < limit):
+                break
+            data = {'page': page}
+            response = self.client.get(
+                self.endpoint + '/articles',
+                params={'page': page}
+            )
+            # Keep the response around for debugging if needed; get a separate
+            # results dict
+            results = response.json()
+
+            if results['count'] == 0:
+                break
+
+            all_articles.extend(results['items'])
+            count += results['count']
+            page += 1
+
+        # Reconstruct the JSON dict in the same format returned by a single
+        # response (with keys [count, items])
+        assert count == len(all_articles)
+        return {'count': count, 'items': all_articles}
+
 
     def create_article(self, title, description, defined_type='fileset'):
         response = self.client.post(self.endpoint + '/articles', data=json.dumps({
