@@ -65,7 +65,7 @@ class Figshare(object):
         assert count == len(all_articles)
         return {'count': count, 'items': all_articles}
 
-    def create_article(self, title, description, defined_type='fileset'):
+    def create_article(self, title, description, defined_type='dataset'):
         response = self.client.post(
             self.endpoint + '/articles',
             data=json.dumps({'title': title,
