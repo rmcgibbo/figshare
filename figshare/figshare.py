@@ -6,10 +6,22 @@ from requests_oauthlib import OAuth1Session
 consumer_key = 'XJCbpn5nHHDNW48NBMx0eg'
 consumer_secret = 'gcxv78Aq6kBulp663LFgug'
 
+
 class Figshare(object):
-    def __init__(self, consumer_key, consumer_secret, access_token, access_token_secret):
-        self.client = OAuth1Session(consumer_key, consumer_secret, access_token, access_token_secret)
+    def __init__(self, consumer_key, consumer_secret, access_token,
+                 access_token_secret):
+        self.client = OAuth1Session(
+            consumer_key, consumer_secret, access_token, access_token_secret)
         self.endpoint = 'http://api.figshare.com/v1/my_data'
+
+    def article(self, article_id):
+        response = self.client.get(self.endpoint + '/articles/%s' % article_id)
+        return json.loads(response.content)
+
+    def delete_article(self, article_id):
+        response = self.client.delete(
+            self.endpoint + '/articles/%s' % article_id)
+        return json.loads(response.content)
 
     def articles(self, limit=None):
         """
@@ -53,26 +65,31 @@ class Figshare(object):
         assert count == len(all_articles)
         return {'count': count, 'items': all_articles}
 
-
     def create_article(self, title, description, defined_type='fileset'):
-        response = self.client.post(self.endpoint + '/articles', data=json.dumps({
-            'title': title,
-            'description': description,
-            'defined_type': defined_type,
-        }), headers={'content-type':'application/json'})
+        response = self.client.post(
+            self.endpoint + '/articles',
+            data=json.dumps({'title': title,
+                             'description': description,
+                             'defined_type': defined_type,
+                             }),
+            headers={'content-type': 'application/json'})
         return response.content.json()
 
     def make_private(self, article_id):
-        response = self.client.post('%s/articles/%s/action/make_private' % (self.endpoint, article_id))
+        response = self.client.post(
+            '%s/articles/%s/action/make_private' % (self.endpoint, article_id))
         return response.content.json()
 
-    def update_article(self, article_id, title=None, description=None, defined_type=None):
+    def update_article(self, article_id, title=None, description=None,
+                       defined_type=None):
         data = {'title': title,
                 'description': description,
                 'defined_type': defined_type}
         data = dict((k, v) for k, v in data.items() if v is not None)
-        headers={'content-type':'application/json'}
-        response = self.client.put('%s/articles/%s' % (self.endpoint, article_id), data=json.dumps(data), headers=headers)
+        headers = {'content-type': 'application/json'}
+        response = self.client.put(
+            '%s/articles/%s' % (self.endpoint, article_id),
+            data=json.dumps(data), headers=headers)
         return json.loads(response.content)
 
     def upload_file(self, article_id, filepath_or_buffer):
@@ -85,13 +102,15 @@ class Figshare(object):
 
         try:
             files = {'filedata': (os.path.basename(file.name), file)}
-            response = self.client.put('%s/articles/%s/files' % (self.endpoint, article_id),
-                                       files=files)
+            response = self.client.put(
+                '%s/articles/%s/files' % (self.endpoint, article_id),
+                files=files)
             return json.loads(response.content)
         finally:
             if own_handle:
                 file.close()
 
     def delete_file(self, article_id, file_id):
-        response = self.client.delete('%s/articles/%s/files/%s' % (self.endpoint, article_id, file_id))
+        response = self.client.delete(
+            '%s/articles/%s/files/%s' % (self.endpoint, article_id, file_id))
         return response.content.json()
