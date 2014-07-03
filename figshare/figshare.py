@@ -135,3 +135,44 @@ class Figshare(object):
             self.endpoint + '/articles/%s/versions' % article_id
         )
         return response.json()
+
+    def add_tag(self, article_id, tag):
+        response = self.client.put(
+            self.endpoint + '/articles/%s/tags' % article_id,
+            data=json.dumps({'tag_name': tag}),
+            headers={'content-type': 'application/json'})
+        return response.json()
+
+    def delete_tag(self, article_id, tag_id):
+        response = self.client.delete(
+            self.endpoint + '/articles/%s/categories/%s' % (article_id, tag_id)
+        )
+        return response.json()
+
+    def add_category(self, article_id, category_id):
+        response = self.client.put(
+            self.endpoint + '/articles/%s/categories' % article_id,
+            data=json.dumps({'category_id': category_id}),
+            headers={'content-type': 'application/json'})
+        return response.json()
+
+    def delete_category(self, article_id, category_id):
+        response = self.client.delete(
+            self.endpoint + '/articles/%s/categories/%s' %
+            (article_id, category_id)
+        )
+        return response.json()
+
+    def add_author(self, article_id, author_id):
+        response = self.client.put(
+            self.endpoint + '/articles/%s/categories' % article_id,
+            data=json.dumps({'author_id': author_id}),
+            headers={'content-type': 'application/json'})
+        return response.json()
+
+    def delete_author(self, article_id, author_id):
+        response = self.client.delete(
+            self.endpoint + '/articles/%s/categories/%s' %
+            (article_id, author_id)
+        )
+        return response.json()
