@@ -73,12 +73,12 @@ class Figshare(object):
                              'defined_type': defined_type,
                              }),
             headers={'content-type': 'application/json'})
-        return response.content.json()
+        return response.json()
 
     def make_private(self, article_id):
         response = self.client.post(
             '%s/articles/%s/action/make_private' % (self.endpoint, article_id))
-        return response.content.json()
+        return response.json()
 
     def update_article(self, article_id, title=None, description=None,
                        defined_type=None):
@@ -86,11 +86,11 @@ class Figshare(object):
                 'description': description,
                 'defined_type': defined_type}
         data = dict((k, v) for k, v in data.items() if v is not None)
-        headers = {'content-type': 'application/json'}
         response = self.client.put(
             '%s/articles/%s' % (self.endpoint, article_id),
-            data=json.dumps(data), headers=headers)
-        return json.loads(response.content)
+            data=json.dumps(data),
+            headers={'content-type': 'application/json'})
+        return response.json()
 
     def upload_file(self, article_id, filepath_or_buffer):
         if isinstance(filepath_or_buffer, six.string_types):
@@ -105,51 +105,33 @@ class Figshare(object):
             response = self.client.put(
                 '%s/articles/%s/files' % (self.endpoint, article_id),
                 files=files)
-            return json.loads(response.content)
+            return response.json()
         finally:
             if own_handle:
                 file.close()
 
     def delete_file(self, article_id, file_id):
         response = self.client.delete(
-            '%s/articles/%s/files/%s' % (self.endpoint, article_id, file_id))
-        return response.content.json()
+            '%s/articles/%s/files/%s' % (self.endpoint, article_id, file_id)
+        )
+        return response.json()
 
-    def add_links(self, article_id, links):
-        """
-        Parameters
-        ----------
-        article_id : int or str
+    def add_link(self, article_id, link):
+        response = self.client.put(
+            self.endpoint + '/articles/%s/links' % article_id,
+            data=json.dumps({'link': link}),
+            headers={'content-type': 'application/json'}
+        )
+        return response.json()
 
-        links : str, or list of str
-        """
-        if isinstance(links, six.string_types):
-            links = [links]
-        article = self.article(article_id)
-        existing_links = article['links']
-
-        for link in links:
-            if link in existing_links:
-                raise ValueError("Link (%s) already added to article" % link)
-
-            body = {'link': link}
-            headers = {'content-type': 'application/json'}
-            response = self.client.put(
-                self.endpoint + '/articles/%s/links' % article_id,
-                data=json.dumps(body), headers=headers)
-            return json.loads(response.content)
+    def delete_link(self, article_id, link_id):
+        response = self.client.delete(
+            self.endpoint + '/articles/%s/links/%s' % (article_id, link_id)
+        )
+        return reponse.json()
 
     def versions(self, article_id):
-        """
-        Parameters
-        ----------
-        article_id : int or str
-
-        Returns
-        -------
-        JSON reponse
-        """
-        return json.loads(
-            self.client.get(
-                self.endpoint + '/articles/%s/versions' % article_id).content
+        response = self.client.get(
+            self.endpoint + '/articles/%s/versions' % article_id
         )
+        return response.json()
