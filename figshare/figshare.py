@@ -114,3 +114,18 @@ class Figshare(object):
         response = self.client.delete(
             '%s/articles/%s/files/%s' % (self.endpoint, article_id, file_id))
         return response.content.json()
+
+    def versions(self, article_id):
+        """
+        Parameters
+        ----------
+        article_id : int or str
+
+        Returns
+        -------
+        JSON reponse
+        """
+        return json.loads(
+            self.client.get(
+                self.endpoint + '/articles/%s/versions' % article_id).content
+        )
