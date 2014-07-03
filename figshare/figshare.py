@@ -16,7 +16,7 @@ class Figshare(object):
 
     def article(self, article_id):
         response = self.client.get(self.endpoint + '/articles/%s' % article_id)
-        return json.loads(response.content)
+        return response.json()['items']
 
     def delete_article(self, article_id):
         response = self.client.delete(
