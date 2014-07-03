@@ -115,6 +115,30 @@ class Figshare(object):
             '%s/articles/%s/files/%s' % (self.endpoint, article_id, file_id))
         return response.content.json()
 
+    def add_links(self, article_id, links):
+        """
+        Parameters
+        ----------
+        article_id : int or str
+
+        links : str, or list of str
+        """
+        if isinstance(links, six.string_types):
+            links = [links]
+        article = self.article(article_id)
+        existing_links = article['links']
+
+        for link in links:
+            if link in existing_links:
+                raise ValueError("Link (%s) already added to article" % link)
+
+            body = {'link': link}
+            headers = {'content-type': 'application/json'}
+            response = self.client.put(
+                self.endpoint + '/articles/%s/links' % article_id,
+                data=json.dumps(body), headers=headers)
+            return json.loads(response.content)
+
     def versions(self, article_id):
         """
         Parameters
