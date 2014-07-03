@@ -136,6 +136,18 @@ class Figshare(object):
         )
         return response.json()
 
+    def get_version(self, article_id, version_number):
+        response = self.client.get(
+            self.endpoint + '/articles/%s/versions/%s' % (article_id, version_number)
+        )
+        return response.json()
+
+    def categories(self):
+        response = self.client.get(
+            self.endpoint.replace('/my_data', '') + '/categories'
+        )
+        return response.json()
+
     def add_tag(self, article_id, tag):
         response = self.client.put(
             self.endpoint + '/articles/%s/tags' % article_id,
